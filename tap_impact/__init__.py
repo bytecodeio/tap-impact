@@ -5,7 +5,7 @@ import json
 import argparse
 import singer
 from singer import metadata, utils
-from tap_impact.client import impactClient
+from tap_impact.client import ImpactClient
 from tap_impact.discover import discover
 from tap_impact.sync import sync
 
@@ -32,7 +32,7 @@ def main():
 
     parsed_args = singer.utils.parse_args(REQUIRED_CONFIG_KEYS)
 
-    with impactClient(parsed_args.config['account_sid'],
+    with ImpactClient(parsed_args.config['account_sid'],
                       parsed_args.config['auth_token'],
                       parsed_args.config['api_catalog'],
                       parsed_args.config['user_agent']) as client:

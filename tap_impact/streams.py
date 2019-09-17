@@ -97,7 +97,7 @@ STREAMS = {
                 'replication_keys': ['modification_date'],
                 'bookmark_type': 'datetime',
                 'parent': 'campaign'
-            },
+            }
         }
     },
     'catalogs': {
@@ -110,7 +110,7 @@ STREAMS = {
         'key_properties': ['id'],
         'replication_method': 'INCREMENTAL',
         'replication_keys': ['date_last_updated'],
-        'bookmark_type': 'datetime'
+        'bookmark_type': 'datetime',
         'children': {
             'catalog_items': {
                 'path': 'Catalogs/{}/Items',
@@ -143,7 +143,7 @@ STREAMS = {
         'key_properties': ['id'],
         'replication_method': 'INCREMENTAL',
         'replication_keys': ['created_date'],
-        'bookmark_type': 'datetime'
+        'bookmark_type': 'datetime',
         'children': {
             'exception_list_items': {
                 'path': 'ExceptionLists/{}/Items',
