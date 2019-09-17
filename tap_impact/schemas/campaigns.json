@@ -3,52 +3,42 @@
   "additionalProperties": false,
   "properties": {
     "categories": {
-      "anyOf": [
-        {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "additional_category": {
-                "type": ["null", "string"]
-              },
-              "additional_sub_categories": {
-                "anyOf": [
-                  {
-                    "type": "array",
-                    "items": {
-                      "type": ["null", "string"]
-                    }
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              },
-              "primary_category": {
-                "type": ["null", "string"]
-              },
-              "primary_sub_categories": {
-                "anyOf": [
-                  {
-                    "type": "array",
-                    "items": {
-                      "type": ["null", "string"]
-                    }
-                  },
-                  {
-                    "type": "null"
-                  }
-                ]
-              }
-            }
-          }
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "additional_category": {
+          "type": ["null", "string"]
         },
-        {
-          "type": "null"
+        "additional_sub_categories": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": ["null", "string"]
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "primary_category": {
+          "type": ["null", "string"]
+        },
+        "primary_sub_categories": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": ["null", "string"]
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
-      ]
+      }
     },
     "company_contacts": {
       "anyOf": [
@@ -68,7 +58,7 @@
                 "type": ["null", "string"]
               },
               "phone_number": {
-                "type": ["null", "integer"]
+                "type": ["null", "string"]
               }
             }
           }

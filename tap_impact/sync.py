@@ -21,9 +21,13 @@ def write_schema(catalog, stream_name):
 
 def write_record(stream_name, record, time_extracted):
     try:
-        singer.message.write_record(stream_name, record, time_extracted=time_extracted)
+        singer.write_record(stream_name, record, time_extracted=time_extracted)
     except OSError as err:
         LOGGER.info('OS Error writing record for: {}'.format(stream_name))
+        LOGGER.info('record: {}'.format(record))
+        raise err
+    except TypeError as err:
+        LOGGER.info('Type Error writing record for: {}'.format(stream_name))
         LOGGER.info('record: {}'.format(record))
         raise err
 
@@ -121,6 +125,7 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
                   bookmark_type=None,
                   data_key=None,
                   id_fields=None,
+                  selected_streams=None,
                   parent=None,
                   parent_id=None):
 
@@ -144,11 +149,12 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
     page = 1
     next_url = '{}/{}.json'.format(client.base_url, path)
     offset = 0
-    limit = 100 # Default limit for Impact API
+    limit = 200 # PageSize (default for API is 100)
     total_records = 0
-    while not next_url:
+    while next_url:
         # Squash params to query-string params
         params = {
+            "PageSize": limit,
             **static_params # adds in endpoint specific, sort, filter params
         }
         if page == 1 and not params == {}:
@@ -215,8 +221,12 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
             stream_name, record_count))
 
         # set total_records and next_url for pagination
-        total_records = data.get('@total', 0)
-        next_url = data.get('@nextpageuri', None)
+        total_records = int(data.get('@total', '0'))
+        next_page_uri = data.get('@nextpageuri', None)
+        if next_page_uri:
+            next_url = '{}{}.json'.format(client.base_url, next_page_uri)
+        else:
+            next_url = None
 
         # Loop thru parent batch records for each children objects (if should stream)
         children = endpoint_config.get('children')
@@ -256,42 +266,34 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
                             bookmark_type=child_endpoint_config.get('bookmark_type'),
                             data_key=child_endpoint_config.get('data_key', 'results'),
                             id_fields=child_endpoint_config.get('key_properties'),
+                            selected_streams=selected_streams,
                             parent=child_endpoint_config.get('parent'),
                             parent_id=parent_id)
                         LOGGER.info(
                             'FINISHED Sync for Stream: {}, parent_id: {}, total_records: {}'\
                                 .format(child_stream_name, parent_id, child_total_records))
 
-            # Update the state with the max_bookmark_value for the stream
-            if bookmark_field:
-                write_bookmark(state, stream_name, max_bookmark_value)
+        # Update the state with the max_bookmark_value for the stream
+        if bookmark_field:
+            write_bookmark(state, stream_name, max_bookmark_value)
 
-            # to_rec: to record; ending record for the batch page
-            to_rec = offset + limit
-            if to_rec > total_records:
-                to_rec = total_records
+        # to_rec: to record; ending record for the batch page
+        to_rec = offset + limit
+        if to_rec > total_records:
+            to_rec = total_records
 
-            LOGGER.info('Synced Stream: {}, page: {}, {} to {} of total records: {}'.format(
-                stream_name,
-                page,
-                offset,
-                to_rec,
-                total_records))
-            # Pagination: increment the offset by the limit (batch-size) and page
-            offset = offset + limit
-            page = page + 1
+        LOGGER.info('Synced Stream: {}, page: {}, {} to {} of total records: {}'.format(
+            stream_name,
+            page,
+            offset,
+            to_rec,
+            total_records))
+        # Pagination: increment the offset by the limit (batch-size) and page
+        offset = offset + limit
+        page = page + 1
 
-        # Increment date window
-        start_window = end_window
-        next_end_window = end_window + timedelta(days=days_interval)
-        if next_end_window > now_datetime:
-            end_window = now_datetime
-        else:
-            end_window = next_end_window
-        endpoint_total = endpoint_total + total_records
-
-    # Return endpoint_total across all batches
-    return endpoint_total
+    # Return total_records (for all pages)
+    return total_records
 
 
 # Currently syncing sets the stream currently being delivered in the state.
@@ -338,11 +340,11 @@ def sync(client, config, catalog, state):
                 path=path,
                 endpoint_config=endpoint_config,
                 static_params=endpoint_config.get('params', {}),
-                bookmark_query_field=endpoint_config.get('bookmark_query_field'),
                 bookmark_field=bookmark_field,
                 bookmark_type=endpoint_config.get('bookmark_type'),
                 data_key=endpoint_config.get('data_key', 'results'),
-                id_fields=endpoint_config.get('key_properties'))
+                id_fields=endpoint_config.get('key_properties'),
+                selected_streams=selected_streams)
 
             update_currently_syncing(state, None)
             LOGGER.info('FINISHED Syncing: {}, total_records: {}'.format(
