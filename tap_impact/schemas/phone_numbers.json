@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "country": {
+      "type": ["null", "string"]
+    },
+    "date_created": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "id": {
+      "type": ["null", "integer"]
+    },
+    "international_number": {
+      "type": ["null", "string"]
+    },
+    "last_date_assigned": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "last_date_released": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "number": {
+      "type": ["null", "string"]
+    },
+    "uri": {
+      "type": ["null", "string"]
+    }
+  }
+}

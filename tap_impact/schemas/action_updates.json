@@ -1,0 +1,93 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "action_date": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "action_id": {
+      "type": ["null", "string"]
+    },
+    "action_tracker_id": {
+      "type": ["null", "string"]
+    },
+    "action_uri": {
+      "type": ["null", "string"]
+    },
+    "ad_id": {
+      "type": ["null", "string"]
+    },
+    "caller_id": {
+      "type": ["null", "string"]
+    },
+    "campaign_id": {
+      "type": ["null", "string"]
+    },
+    "category": {
+      "type": ["null", "string"]
+    },
+    "clearing_date": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "currency": {
+      "type": ["null", "string"]
+    },
+    "customer_id": {
+      "type": ["null", "string"]
+    },
+    "customer_status": {
+      "type": ["null", "string"]
+    },
+    "delta_amount": {
+      "type": ["null", "number"],
+      "multipleOf": 1e-2
+    },
+    "delta_payout": {
+      "type": ["null", "number"],
+      "multipleOf": 1e-2
+    },
+    "disposition": {
+      "type": ["null", "string"]
+    },
+    "id": {
+      "type": ["null", "string"]
+    },
+    "locking_date": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "media_partner_id": {
+      "type": ["null", "string"]
+    },
+    "oid": {
+      "type": ["null", "string"]
+    },
+    "quantity": {
+      "type": ["null", "string"]
+    },
+    "shared_id": {
+      "type": ["null", "string"]
+    },
+    "sku": {
+      "type": ["null", "string"]
+    },
+    "state": {
+      "type": ["null", "string"]
+    },
+    "state_detail": {
+      "type": ["null", "string"]
+    },
+    "state_detail_description": {
+      "type": ["null", "string"]
+    },
+    "update_date": {
+      "type": ["null", "string"],
+      "format": "date-time"
+    },
+    "uri": {
+      "type": ["null", "string"]
+    }
+  }
+}

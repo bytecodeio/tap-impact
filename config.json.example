@@ -1,0 +1,7 @@
+{
+    "account_sid": "YOUR_API_ACCOUNT_SID",
+    "auth_token": "YOUR_API_AUTH_TOKEN",
+    "api_catalog": "YOUR_API_CATALOG",
+    "start_date": "2019-01-01T00:00:00Z",
+    "user_agent": "tap-impact <api_user_email@your_company.com>"
+}
