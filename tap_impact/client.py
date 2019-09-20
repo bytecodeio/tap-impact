@@ -54,6 +54,8 @@ class ImpactUnprocessableEntityError(ImpactError):
 class ImpactInternalServiceError(ImpactError):
     pass
 
+class ImpactUnknownError(ImpactError):
+    pass
 
 ERROR_CODE_EXCEPTION_MAPPING = {
     400: ImpactBadRequestError,
@@ -64,7 +66,8 @@ ERROR_CODE_EXCEPTION_MAPPING = {
     405: ImpactMethodNotAllowedError,
     409: ImpactConflictError,
     422: ImpactUnprocessableEntityError,
-    500: ImpactInternalServiceError}
+    500: ImpactInternalServiceError,
+    520: ImpactUnknownError}
 
 
 def get_exception_for_error_code(error_code):
@@ -119,8 +122,8 @@ class ImpactClient(object):
 
     @backoff.on_exception(backoff.expo,
                           Server5xxError,
-                          max_tries=5,
-                          factor=2)
+                          max_tries=7,
+                          factor=3)
     def check_access(self):
         if self.__account_sid is None or self.__auth_token is None:
             raise Exception('Error: Missing account_sid or auth_token in config.json.')

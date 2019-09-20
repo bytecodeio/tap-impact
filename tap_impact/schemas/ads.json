@@ -68,7 +68,8 @@
       "type": ["null", "string"]
     },
     "customisation_charge": {
-      "type": ["null", "integer"]
+      "type": ["null", "number"],
+      "multipleOf": 1e-2
     },
     "deal_categories": {
       "type": ["null", "string"]

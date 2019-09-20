@@ -34,6 +34,7 @@ This tap:
   - [Phone Numbers](https://developer.impact.com/default#operations-Phone_Numbers-GetPhoneNumbers)
   - [Promo Codes](https://developer.impact.com/default#operations-Promo_Codes-GetPromoCodes)
   - [Reports](https://developer.impact.com/default#operations-Reports-ListReports)
+    - [Report Metadata](https://developer.impact.com/default/documentation/Rest-Adv-v8#operations-Reports-GetReportMetadata)
   - [Tracking Value Requests](https://developer.impact.com/default#operations-Tracking_Value_Requests-GetTrackingValueRequests)
   - [Unique URLs](https://developer.impact.com/default#operations-Unique_Urls-GetUniqueUrls)
   - 
@@ -46,8 +47,10 @@ This tap:
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/Actions
 - Primary key fields: id
 - Foreign key fields: ad_id, caller_id, campaign_id, customer_id, media_partner_id, shared_id
-- Replication strategy: FULL_TABLE (ALL for parent Campaign)
-  - Filters: campaign_id (parent)
+- Replication strategy: INCREMENTAL (Query filtered)
+  - Filter: CampaignId (parent)
+  - Filter: StartDate (event_date)
+  - Bookmark: event_date
 - Transformations: camelCase to snake_case
 - Parent: campaigns
 
@@ -55,8 +58,10 @@ This tap:
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/ActionInquiries
 - Primary key fields: id
 - Foreign key fields: action_id, campaign_id, media_partner_id, order_id
-- Replication strategy: FULL_TABLE (ALL for parent Campaign)
-  - Filters: campaign_id (parent)
+- Replication strategy: INCREMENTAL (Query filtered)
+  - Filter: CampaignId (parent)
+  - Filter: StartDate (creation_date)
+  - Bookmark: creation_date
 - Transformations: camelCase to snake_case
 - Parent: campaigns
 
@@ -64,8 +69,10 @@ This tap:
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/ActionUpdates
 - Primary key fields: id
 - Foreign key fields: action_id, ad_id, caller_id, campaign_id, customer_id, media_partner_id, shared_id
-- Replication strategy: FULL_TABLE (ALL for parent Campaign)
-  - Filters: campaign_id (parent)
+- Replication strategy: INCREMENTAL (Query filtered)
+  - Filter: CampaignId (parent)
+  - Filter: StartDate (update_date)
+  - Bookmark: update_date
 - Transformations: camelCase to snake_case
 - Parent: campaigns
 
@@ -82,7 +89,6 @@ This tap:
 - Foreign key fields: account_id, campaign_id, media_partner_id, order_id
 - Replication strategy: INCREMENTAL (query all, filter_results)
   - Bookmark: submission_date (date-time)
-  - Sort: SubmissionDate ASC
 - Transformations: camelCase to snake_case
 
 [campaigns](https://developer.impact.com/default#operations-Campaigns-GetCampaigns)
@@ -97,9 +103,7 @@ This tap:
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/Catalogs
 - Primary key fields: id
 - Foreign key fields: campaign_id, advertiser_id
-- Replication strategy: INCREMENTAL (query all, filter_results)
-  - Bookmark: date_last_updated (date-time)
-  - Sort: DateLastUpdated ASC
+- Replication strategy: FULL_TABLE
 - Transformations: camelCase to snake_case
 - Children: catalog_items
 
@@ -115,7 +119,10 @@ This tap:
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/Campaigns/{campaign_id}/Clicks
 - Primary key fields: id
 - Foreign key fields: ad_id, campaign_id, media_id, shared_id
-- Replication strategy: FULL_TABLE (ALL for parent Campaign)
+- Replication strategy: INCREMENTAL (Query filtered by Date for parent CampaignId)
+  - Filter: CampaignId (parent)
+  - Filter: Date (event_date)
+  - Bookmark: event_date
 - Transformations: camelCase to snake_case
 - Parent: campaigns
 
@@ -138,9 +145,7 @@ This tap:
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/ExceptionLists
 - Primary key fields: id
 - Foreign key fields: campaign_id
-- Replication strategy: INCREMENTAL (query all, filter_results)
-  - Bookmark: created_date (date-time)
-  - Sort: CreatedDate ASC
+- Replication strategy: FULL_TABLE
 - Transformations: camelCase to snake_case
 - Children: exception_list_items
 
@@ -166,18 +171,16 @@ This tap:
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/Invoices
 - Primary key fields: id
 - Foreign key fields: campaign_id, media_id
-- Replication strategy: INCREMENTAL (query all, filter_results)
+- Replication strategy: INCREMENTAL (Query filtered)
+  - Filter: StartDate (created_date)
   - Bookmark: created_date (date-time)
-  - Sort: CreatedDate ASC
 - Transformations: camelCase to snake_case
 
 [media_partners](https://developer.impact.com/default#operations-Partners-GetMediaPartners)
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/MediaPartners
 - Primary key fields: id
 - Foreign key fields: campaign_id
-- Replication strategy: INCREMENTAL (query all, filter_results)
-  - Bookmark: date_created (date-time)
-  - Sort: DateCreated ASC
+- Replication strategy: FULL_TABLE
 - Transformations: camelCase to snake_case
 
 [media_partner_groups](https://developer.impact.com/default#operations-Partner_Groups-GetMediaPartnerGroups)
@@ -202,18 +205,14 @@ This tap:
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/PhoneNumbers
 - Primary key fields: id
 - Foreign key fields: none
-- Replication strategy: INCREMENTAL (query all, filter_results)
-  - Bookmark: date_created (date-time)
-  - Sort: DateCreated ASC
+- Replication strategy: FULL_TABLE
 - Transformations: camelCase to snake_case
 
 [promo_codes](https://developer.impact.com/default#operations-Promo_Codes-GetPromoCodes)
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/PromoCodes
 - Primary key fields: id
 - Foreign key fields: campaign_id
-- Replication strategy: INCREMENTAL (query all, filter_results)
-  - Bookmark: date_created (date-time)
-  - Sort: DateCreated ASC
+- Replication strategy: FULL_TABLE
 - Transformations: camelCase to snake_case
 
 [reports](https://developer.impact.com/default#operations-Reports-ListReports)
@@ -223,22 +222,25 @@ This tap:
 - Replication strategy: FULL_TABLE
 - Transformations: camelCase to snake_case
 
+[report_metadata](https://developer.impact.com/default/documentation/Rest-Adv-v8#operations-Reports-GetReportMetadata)
+- Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/Reports/{report_id}/MetaData
+- Primary key fields: id
+- Foreign key fields: none
+- Replication strategy: FULL_TABLE (ALL for parent report_id)
+- Transformations: camelCase to snake_case
+
 [tracking_value_requests](https://developer.impact.com/default#operations-Tracking_Value_Requests-GetTrackingValueRequests)
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/TrackingValueRequests
 - Primary key fields: id
 - Foreign key fields: campaign_id, deal_id, media_partner_id, phone_numbers > id, promo_codes > id, unique_urls > id
-- Replication strategy: INCREMENTAL (query all, filter_results)
-  - Bookmark: date_placed (date-time)
-  - Sort: DatePlaced ASC
+- Replication strategy: FULL_TABLE
 - Transformations: camelCase to snake_case
 
 [unique_urls](https://developer.impact.com/default#operations-Unique_Urls-GetUniqueUrls)
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/UniqueUrls
 - Primary key fields: id
 - Foreign key fields: campaign_id, media_partner_id
-- Replication strategy: INCREMENTAL (query all, filter_results)
-  - Bookmark: date_created (date-time)
-  - Sort: DateCreated ASC
+- Replication strategy: FULL_TABLE
 - Transformations: camelCase to snake_case
 
 ## Quick Start

@@ -8,7 +8,7 @@
 #        and setting the state
 #   params: Query, sort, and other endpoint specific parameters
 #   data_key: JSON element containing the records for the endpoint
-#   bookmark_query_field: From date-time field used for filtering the query
+#   bookmark_query_field: Typically a date-time field used for filtering the query
 #   bookmark_type: Data type for bookmark, integer or datetime
 #   children: A collection of child endpoints (where the endpoint path includes the parent id)
 #   parent: On each of the children, the singular stream name for parent element
@@ -22,10 +22,6 @@ STREAMS = {
     'api_submissions': {
         'path': 'APISubmissions',
         'data_key': 'APISubmission',
-        'params': {
-            'SortBy': 'SubmissionDate',
-            'SortOrder': 'ASC'
-        },
         'key_properties': ['batch_id'],
         'replication_method': 'INCREMENTAL',
         'replication_keys': ['submission_date'],
@@ -41,34 +37,46 @@ STREAMS = {
                 'path': 'Actions',
                 'data_key': 'Actions',
                 'params': {
-                    'CampaignId': '<parent_id>'
+                    'CampaignId': '<parent_id>',
+                    'StartDate': '<last_datetime>'
                 },
                 'key_properties': ['id'],
-                'replication_method': 'FULL_TABLE'
+                'replication_method': 'INCREMENTAL',
+                'replication_keys': ['event_date'],
+                'bookmark_type': 'datetime'
             },
             'action_inquiries': {
                 'path': 'ActionInquiries',
                 'data_key': 'ActionInqueries',
                 'params': {
-                    'CampaignId': '<parent_id>'
+                    'CampaignId': '<parent_id>',
+                    'StartDate': '<last_datetime>'
                 },
                 'key_properties': ['id'],
-                'replication_method': 'FULL_TABLE'
+                'replication_method': 'INCREMENTAL',
+                'replication_keys': ['creation_date'],
+                'bookmark_type': 'datetime'
             },
             'action_updates': {
                 'path': 'ActionUpdates',
                 'data_key': 'ActionUpdates',
                 'params': {
-                    'CampaignId': '<parent_id>'
+                    'CampaignId': '<parent_id>',
+                    'StartDate': '<last_datetime>'
                 },
                 'key_properties': ['id'],
-                'replication_method': 'FULL_TABLE'
+                'replication_method': 'INCREMENTAL',
+                'replication_keys': ['update_date'],
+                'bookmark_type': 'datetime'
             },
             'clicks': {
                 'path': 'Campaigns/{}/Clicks',
                 'data_key': 'Clicks',
                 'key_properties': ['id'],
-                'replication_method': 'FULL_TABLE'
+                'replication_method': 'INCREMENTAL',
+                'replication_keys': ['event_date'],
+                'bookmark_type': 'datetime',
+                'bookmark_query_field': 'Date'
             },
             'contacts': {
                 'path': 'Campaigns/{}/Contacts',
@@ -88,10 +96,6 @@ STREAMS = {
                 'path': 'Campaigns/{}/Notes',
                 'data_key': 'Notes',
                 'key_properties': ['id'],
-                'params': {
-                    'SortBy': 'SubmissionDate',
-                    'SortOrder': 'ASC'
-                },
                 'key_properties': ['batch_id'],
                 'replication_method': 'INCREMENTAL',
                 'replication_keys': ['modification_date'],
@@ -103,14 +107,8 @@ STREAMS = {
     'catalogs': {
         'path': 'Catalogs',
         'data_key': 'Catalogs',
-        'params': {
-            'SortBy': 'DateLastUpdated',
-            'SortOrder': 'ASC'
-        },
         'key_properties': ['id'],
-        'replication_method': 'INCREMENTAL',
-        'replication_keys': ['date_last_updated'],
-        'bookmark_type': 'datetime',
+        'replication_method': 'FULL_TABLE',
         'children': {
             'catalog_items': {
                 'path': 'Catalogs/{}/Items',
@@ -136,14 +134,8 @@ STREAMS = {
     'exception_lists': {
         'path': 'ExceptionLists',
         'data_key': 'ExceptionLists',
-        'params': {
-            'SortBy': 'CreatedDate',
-            'SortOrder': 'ASC'
-        },
         'key_properties': ['id'],
-        'replication_method': 'INCREMENTAL',
-        'replication_keys': ['created_date'],
-        'bookmark_type': 'datetime',
+        'replication_method': 'FULL_TABLE',
         'children': {
             'exception_list_items': {
                 'path': 'ExceptionLists/{}/Items',
@@ -156,10 +148,6 @@ STREAMS = {
     'ftp_file_submissions': {
         'path': 'FTPFileSubmissions',
         'data_key': 'FTPFileSubmissions',
-        'params': {
-            'SortBy': 'SubmissionDate',
-            'SortOrder': 'ASC'
-        },
         'key_properties': ['batch_id'],
         'replication_method': 'INCREMENTAL',
         'replication_keys': ['submission_date'],
@@ -169,8 +157,7 @@ STREAMS = {
         'path': 'Invoices',
         'data_key': 'Invoices',
         'params': {
-            'SortBy': 'CreatedDate',
-            'SortOrder': 'ASC'
+            'StartDate': '<last_datetime>'
         },
         'key_properties': ['id'],
         'replication_method': 'INCREMENTAL',
@@ -180,67 +167,66 @@ STREAMS = {
     'media_partners': {
         'path': 'MediaPartners',
         'data_key': 'MediaPartners',
-        'params': {
-            'SortBy': 'CreatedDate',
-            'SortOrder': 'ASC'
-        },
         'key_properties': ['id'],
-        'replication_method': 'INCREMENTAL',
-        'replication_keys': ['created_date'],
-        'bookmark_type': 'datetime'
+        'replication_method': 'FULL_TABLE'
     },
     'phone_numbers': {
         'path': 'PhoneNumbers',
         'data_key': 'PhoneNumbers',
-        'params': {
-            'SortBy': 'DateCreated',
-            'SortOrder': 'ASC'
-        },
         'key_properties': ['id'],
-        'replication_method': 'INCREMENTAL',
-        'replication_keys': ['date_created'],
-        'bookmark_type': 'datetime'
+        'replication_method': 'FULL_TABLE'
     },
     'promo_codes': {
         'path': 'PromoCodes',
         'data_key': 'PromoCodes',
-        'params': {
-            'SortBy': 'DateCreated',
-            'SortOrder': 'ASC'
-        },
         'key_properties': ['id'],
-        'replication_method': 'INCREMENTAL',
-        'replication_keys': ['date_created'],
-        'bookmark_type': 'datetime'
+        'replication_method': 'FULL_TABLE'
     },
     'reports': {
         'path': 'Reports',
         'data_key': 'Reports',
         'key_properties': ['id'],
         'replication_method': 'FULL_TABLE',
+        'children': {
+            'report_metadata': {
+                'path': 'Reports/{}/MetaData',
+                'data_key': 'MetaData',
+                'key_properties': ['id'],
+                'replication_method': 'FULL_TABLE'
+            }
+        }
     },
     'tracking_value_requests': {
         'path': 'TrackingValueRequests',
         'data_key': 'TrackingValueRequests',
-        'params': {
-            'SortBy': 'DatePlaced',
-            'SortOrder': 'ASC'
-        },
         'key_properties': ['id'],
-        'replication_method': 'INCREMENTAL',
-        'replication_keys': ['date_placed'],
-        'bookmark_type': 'datetime'
+        'replication_method': 'FULL_TABLE'
     },
     'unique_urls': {
         'path': 'UniqueUrls',
         'data_key': 'UniqueUrls',
-        'params': {
-            'SortBy': 'DateCreated',
-            'SortOrder': 'ASC'
-        },
         'key_properties': ['id'],
-        'replication_method': 'INCREMENTAL',
-        'replication_keys': ['date_created'],
-        'bookmark_type': 'datetime'
+        'replication_method': 'FULL_TABLE'
     }
 }
+
+
+def flatten_streams():
+    flat_streams = {}
+    # Loop through parents
+    for stream_name, endpoint_config in STREAMS.items():
+        flat_streams[stream_name] = {
+            'key_properties': endpoint_config.get('key_properties'),
+            'replication_method': endpoint_config.get('replication_method'),
+            'replication_keys': endpoint_config.get('replication_keys')
+        }
+        # Loop through children
+        children = endpoint_config.get('children')
+        if children:
+            for child_stream_name, child_enpoint_config in children.items():
+                flat_streams[child_stream_name] = {
+                    'key_properties': child_enpoint_config.get('key_properties'),
+                    'replication_method': child_enpoint_config.get('replication_method'),
+                    'replication_keys': child_enpoint_config.get('replication_keys')
+                }
+    return flat_streams

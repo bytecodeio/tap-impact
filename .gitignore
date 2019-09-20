@@ -4,7 +4,7 @@ config/
 virtualenvs/
 catalog.json
 *config*.json
-*state*.json
+state*.json
 target*.json
 *.sublime-*
 .python-version
@@ -17,3 +17,5 @@ venv/
 build/
 tap_impact/.vscode/settings.json
 *.ipynb
+tap_target_commands.sh
+.DS_Store

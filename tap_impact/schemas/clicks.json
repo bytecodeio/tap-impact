@@ -37,7 +37,7 @@
       "multipleOf": 1e-2
     },
     "customer_area": {
-      "type": ["null", "integer"]
+      "type": ["null", "string"]
     },
     "customer_city": {
       "type": ["null", "string"]
@@ -111,7 +111,7 @@
       "type": ["null", "string"]
     },
     "shared_id": {
-      "type": ["null", "integer"]
+      "type": ["null", "string"]
     },
     "traffic_category": {
       "type": ["null", "string"]

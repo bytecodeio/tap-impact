@@ -29,7 +29,8 @@
       "format": "date-time"
     },
     "client_cost": {
-      "type": ["null", "integer"]
+      "type": ["null", "number"],
+      "multipleOf": 1e-2
     },
     "creation_date": {
       "type": ["null", "string"],

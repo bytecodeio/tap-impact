@@ -1,7 +1,7 @@
 import os
 import json
 from singer import metadata
-from tap_impact.streams import STREAMS
+from tap_impact.streams import flatten_streams
 
 # Reference:
 # https://github.com/singer-io/getting-started/blob/master/docs/DISCOVERY_MODE.md#Metadata
@@ -13,7 +13,8 @@ def get_schemas():
     schemas = {}
     field_metadata = {}
 
-    for stream_name, stream_metadata in STREAMS.items():
+    flat_streams = flatten_streams()
+    for stream_name, stream_metadata in flat_streams.items():
         schema_path = get_abs_path('schemas/{}.json'.format(stream_name))
         with open(schema_path) as file:
             schema = json.load(file)

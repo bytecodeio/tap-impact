@@ -20,6 +20,24 @@
           }
         },
         {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "account": {
+              "type": ["null", "object"],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": ["null", "integer"]
+                },
+                "name": {
+                  "type": ["null", "string"]
+                }
+              }
+            }
+          }
+        },
+        {
           "type": "null"
         }
       ]
@@ -40,7 +58,7 @@
       "type": ["null", "string"]
     },
     "id": {
-      "type": ["null", "integer"]
+      "type": ["null", "string"]
     },
     "labels": {
       "anyOf": [
