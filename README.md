@@ -37,7 +37,7 @@ This tap:
     - [Report Metadata](https://developer.impact.com/default/documentation/Rest-Adv-v8#operations-Reports-GetReportMetadata)
   - [Tracking Value Requests](https://developer.impact.com/default#operations-Tracking_Value_Requests-GetTrackingValueRequests)
   - [Unique URLs](https://developer.impact.com/default#operations-Unique_Urls-GetUniqueUrls)
-  - 
+
 - Outputs the schema for each resource
 - Incrementally pulls data based on the input state
 
@@ -284,10 +284,15 @@ This tap:
 
     ```json
     {
-        "currently_syncing": "invoices",
+        "currently_syncing": "ftp_file_submissions",
         "bookmarks": {
-            "invoices": "2019-06-11T13:37:51Z",
-            "TBD": "TBD"
+            "actions": "2019-09-21T01:05:17.000000Z",
+            "action_inquiries": "2019-09-14T14:34:03.000000Z",
+            "action_updates": "2019-09-21T02:27:16.000000Z",
+            "clicks": "2019-09-21T00:54:26.000000Z",
+            "api_submissions": "2019-09-21T00:47:35.000000Z",
+            "ftp_submissions": "2019-09-20T00:42:39.000000Z",
+            "invoices": "2019-09-03T10:02:01.000000Z"
         }
     }
     ```
