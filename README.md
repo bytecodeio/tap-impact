@@ -327,7 +327,7 @@ This tap:
     ```
     Pylint test resulted in the following score:
     ```bash
-    Your code has been rated at TBD
+    Your code has been rated at 9.79/10
     ```
 
     To [check the tap](https://github.com/singer-io/singer-tools#singer-check-tap) and verify working:
@@ -337,8 +337,44 @@ This tap:
     ```
     Check tap resulted in the following:
     ```bash
+    Checking stdin for valid Singer-formatted data
     The output is valid.
-    TBD
+    It contained 80959 messages for 24 streams.
+
+        135 schema messages
+    80766 record messages
+        58 state messages
+
+    Details by stream:
+    +-------------------------+---------+---------+
+    | stream                  | records | schemas |
+    +-------------------------+---------+---------+
+    | tracking_value_requests | 0       | 1       |
+    | ftp_file_submissions    | 0       | 1       |
+    | api_submissions         | 345     | 1       |
+    | unique_urls             | 0       | 1       |
+    | invoices                | 34      | 1       |
+    | ads                     | 54      | 1       |
+    | phone_numbers           | 603     | 1       |
+    | deals                   | 1       | 1       |
+    | campaigns               | 1       | 1       |
+    | notes                   | 0       | 1       |
+    | media_partner_groups    | 10      | 1       |
+    | action_updates          | 1389    | 1       |
+    | actions                 | 1075    | 1       |
+    | action_inquiries        | 1       | 1       |
+    | clicks                  | 76213   | 1       |
+    | contacts                | 383     | 1       |
+    | exception_lists         | 0       | 1       |
+    | promo_codes             | 20      | 1       |
+    | media_partners          | 230     | 1       |
+    | catalogs                | 1       | 1       |
+    | catalog_items           | 181     | 1       |
+    | reports                 | 112     | 1       |
+    | report_metadata         | 112     | 1       |
+    | company_information     | 1       | 1       |
+    +-------------------------+---------+---------+
+
     ```
 ---
 

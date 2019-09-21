@@ -143,8 +143,6 @@ def sync_endpoint(client,
         last_datetime = get_bookmark(state, stream_name, start_date)
         max_bookmark_value = last_datetime
 
-    write_schema(catalog, stream_name)
-
     end_dttm = utils.now()
     end_dt = end_dttm.date()
     start_dttm = end_dttm
@@ -186,7 +184,7 @@ def sync_endpoint(client,
             if page == 1 and not params == {}:
                 param_string = '&'.join(['%s=%s' % (key, value) for (key, value) in params.items()])
                 querystring = param_string.replace('<parent_id>', str(parent_id)).replace(
-                    '<last_datetime>', last_datetime)
+                    '<last_datetime>', strptime_to_utc(last_datetime).strftime('%Y-%m-%dT%H:%M:%SZ'))
             else:
                 querystring = None
             LOGGER.info('URL for Stream {}: {}{}'.format(
@@ -282,6 +280,7 @@ def sync_endpoint(client,
             if children:
                 for child_stream_name, child_endpoint_config in children.items():
                     if child_stream_name in selected_streams:
+                        write_schema(catalog, child_stream_name)
                         # For each parent record
                         for record in transformed_data:
                             i = 0
@@ -388,6 +387,7 @@ def sync(client, config, catalog, state):
             update_currently_syncing(state, stream_name)
             path = endpoint_config.get('path', stream_name)
             bookmark_field = next(iter(endpoint_config.get('replication_keys', [])), None)
+            write_schema(catalog, stream_name)
             total_records = sync_endpoint(
                 client=client,
                 catalog=catalog,
