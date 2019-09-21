@@ -10,19 +10,19 @@
       "type": ["null", "string"]
     },
     "action_tracker_id": {
-      "type": ["null", "string"]
+      "type": ["null", "integer"]
     },
     "action_uri": {
       "type": ["null", "string"]
     },
     "ad_id": {
-      "type": ["null", "string"]
+      "type": ["null", "integer"]
     },
     "caller_id": {
       "type": ["null", "string"]
     },
     "campaign_id": {
-      "type": ["null", "string"]
+      "type": ["null", "integer"]
     },
     "category": {
       "type": ["null", "string"]
@@ -35,7 +35,7 @@
       "type": ["null", "string"]
     },
     "customer_id": {
-      "type": ["null", "string"]
+      "type": ["null", "integer"]
     },
     "customer_status": {
       "type": ["null", "string"]
@@ -59,13 +59,13 @@
       "format": "date-time"
     },
     "media_partner_id": {
-      "type": ["null", "string"]
+      "type": ["null", "integer"]
     },
     "oid": {
       "type": ["null", "string"]
     },
     "quantity": {
-      "type": ["null", "string"]
+      "type": ["null", "integer"]
     },
     "shared_id": {
       "type": ["null", "string"]

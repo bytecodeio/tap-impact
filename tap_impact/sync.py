@@ -1,5 +1,4 @@
-from datetime import timedelta, date
-import math
+from datetime import timedelta
 import singer
 from singer import metrics, metadata, Transformer, utils
 from singer.utils import strptime_to_utc, strftime
@@ -21,7 +20,7 @@ def write_schema(catalog, stream_name):
 
 def write_record(stream_name, record, time_extracted):
     try:
-        singer.write_record(stream_name, record, time_extracted=time_extracted)
+        singer.messages.write_record(stream_name, record, time_extracted=time_extracted)
     except OSError as err:
         LOGGER.info('OS Error writing record for: {}'.format(stream_name))
         LOGGER.info('record: {}'.format(record))
@@ -114,7 +113,7 @@ def process_records(catalog, #pylint: disable=too-many-branches
 
 
 # Sync a specific parent or child endpoint.
-def sync_endpoint(client, #pylint: disable=too-many-branches
+def sync_endpoint(client,
                   catalog,
                   state,
                   start_date,
@@ -136,7 +135,7 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
     last_datetime = None
     last_integer = None
     max_bookmark_value = None
-    
+
     if bookmark_type == 'integer':
         last_integer = get_bookmark(state, stream_name, 0)
         max_bookmark_value = last_integer
@@ -146,14 +145,10 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
 
     write_schema(catalog, stream_name)
 
-    limit = 1000 # PageSize (default for API is 100)
-
     end_dttm = utils.now()
     end_dt = end_dttm.date()
-    end_dt_str = strftime(end_dttm)[0:10]
     start_dttm = end_dttm
     start_dt = end_dt
-    start_dt_str = end_dt_str
 
     if bookmark_query_field:
         if bookmark_type == 'datetime':
@@ -166,11 +161,12 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
     date_list = [str(start_dt + timedelta(days=x)) for x in range((end_dt - start_dt).days + 1)]
     endpoint_total = 0
     total_records = 0
+    limit = 1000 # PageSize (default for API is 100)
     for bookmark_date in date_list:
         page = 1
         offset = 0
         total_records = 0
-        if stream_name in ('clicks'):
+        if stream_name == 'clicks':
             LOGGER.info('Stream: {}, Syncing bookmark_date = {}'.format(
                 stream_name, bookmark_date))
         next_url = '{}/{}.json'.format(client.base_url, path)
@@ -212,6 +208,28 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
                 total_records = 0
                 break # No data results
 
+            # Get pagination details
+            api_total = int(data.get('@total', '0'))
+            page_size = int(data.get('@pagesize', '0'))
+            if page_size:
+                if page_size > limit:
+                    limit = page_size
+            next_page_uri = data.get('@nextpageuri', None)
+            if next_page_uri:
+                next_url = '{}{}'.format(BASE_URL, next_page_uri)
+            else:
+                next_url = None
+
+            # Break out of loop if only paginations details data (no records)
+            #   or no data_key in data
+            #  company_information and report_metadata do not have pagination details
+            if not stream_name in ('company_information', 'report_metadata'):
+                # catalog_items has bug where api_total is always 0
+                if (not stream_name == 'catalog_items') and (api_total == 0) and (not next_url):
+                    break
+                if not data_key in data:
+                    break
+
             # Transform data with transform_json from transform.py
             # The data_key identifies the array/list of records below the <root> element
             # LOGGER.info('data = {}'.format(data)) # TESTING, comment out
@@ -222,18 +240,26 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
                 data_list = data
                 data_dict[data_key] = data_list
                 transformed_data = transform_json(data_dict)[convert(data_key)]
-            elif isinstance(data ,dict) and not data_key in data:
+            elif isinstance(data, dict) and not data_key in data:
                 data_list.append(data)
                 data_dict[data_key] = data_list
                 transformed_data = transform_json(data_dict)[convert(data_key)]
             else:
                 transformed_data = transform_json(data)[convert(data_key)]
 
-            # LOGGER.info('transformed_data = {}'.format(transformed_data))  # TESTING, comment out
+            # LOGGER.info('transformed_data = {}'.format(transformed_data)) # TESTING, comment out
             if not transformed_data or transformed_data is None:
-                LOGGER.info('No transformed data for data = {}'.format(data)) 
+                LOGGER.info('No transformed data for data = {}'.format(data))
                 total_records = 0
                 break # No data results
+
+            # Verify key id_fields are present
+            for record in transformed_data:
+                for key in id_fields:
+                    if not record.get(key):
+                        LOGGER.info('Stream: {}, Missing key {} in record: {}'.format(
+                            stream_name, key, record))
+                        raise RuntimeError
 
             # Process records and get the max_bookmark_value and record_count for the set of records
             max_bookmark_value, record_count = process_records(
@@ -250,14 +276,6 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
                 parent_id=parent_id)
             LOGGER.info('Stream {}, batch processed {} records'.format(
                 stream_name, record_count))
-
-            # set total_records and next_url for pagination
-            total_records = int(data.get('@total', '0'))
-            next_page_uri = data.get('@nextpageuri', None)
-            if next_page_uri:
-                next_url = '{}{}'.format(BASE_URL, next_page_uri)
-            else:
-                next_url = None
 
             # Loop thru parent batch records for each children objects (if should stream)
             children = endpoint_config.get('children')
@@ -293,7 +311,8 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
                                 path=child_path,
                                 endpoint_config=child_endpoint_config,
                                 static_params=child_endpoint_config.get('params', {}),
-                                bookmark_query_field=child_endpoint_config.get('bookmark_query_field'),
+                                bookmark_query_field=child_endpoint_config.get(
+                                    'bookmark_query_field'),
                                 bookmark_field=child_bookmark_field,
                                 bookmark_type=child_endpoint_config.get('bookmark_type'),
                                 data_key=child_endpoint_config.get('data_key', 'results'),
@@ -308,6 +327,12 @@ def sync_endpoint(client, #pylint: disable=too-many-branches
             # Update the state with the max_bookmark_value for the stream
             if bookmark_field:
                 write_bookmark(state, stream_name, max_bookmark_value)
+
+            # Adjust total_records w/ record_count, if needed
+            if record_count > total_records:
+                total_records = total_records + record_count
+            else:
+                total_records = api_total
 
             # to_rec: to record; ending record for the batch page
             to_rec = offset + limit

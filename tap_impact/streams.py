@@ -47,7 +47,7 @@ STREAMS = {
             },
             'action_inquiries': {
                 'path': 'ActionInquiries',
-                'data_key': 'ActionInqueries',
+                'data_key': 'ActionInquiries',
                 'params': {
                     'CampaignId': '<parent_id>',
                     'StartDate': '<last_datetime>'
@@ -96,7 +96,6 @@ STREAMS = {
                 'path': 'Campaigns/{}/Notes',
                 'data_key': 'Notes',
                 'key_properties': ['id'],
-                'key_properties': ['batch_id'],
                 'replication_method': 'INCREMENTAL',
                 'replication_keys': ['modification_date'],
                 'bookmark_type': 'datetime',
