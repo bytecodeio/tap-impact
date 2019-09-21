@@ -6,7 +6,7 @@ spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
 
 This tap:
 
-- Pulls raw data from the [Impact APIs](https://developer.impact.com/default)
+- Pulls raw data from the following [Impact Radius API](https://developer.impact.com/default) catalogs:
   - [Advertiser API](https://developer.impact.com/default/documentation/Rest-Adv-v8)
   - [Agency API](https://developer.impact.com/default/documentation/Agencies)
   - [Partner API](https://developer.impact.com/default/documentation/Rest-Mp-v11)
