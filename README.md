@@ -221,13 +221,15 @@ This tap:
 - Foreign key fields: none
 - Replication strategy: FULL_TABLE
 - Transformations: camelCase to snake_case
+- Children: report_metadata
 
 [report_metadata](https://developer.impact.com/default/documentation/Rest-Adv-v8#operations-Reports-GetReportMetadata)
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/Reports/{report_id}/MetaData
 - Primary key fields: id
-- Foreign key fields: none
-- Replication strategy: FULL_TABLE (ALL for parent report_id)
+- Foreign key fields: id (reports)
+- Replication strategy: FULL_TABLE (ALL for parent report id)
 - Transformations: camelCase to snake_case
+- Parent: reports
 
 [tracking_value_requests](https://developer.impact.com/default#operations-Tracking_Value_Requests-GetTrackingValueRequests)
 - Endpoint: https://api.impact.com/{api_catalog}/{account_sid}/TrackingValueRequests
