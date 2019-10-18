@@ -2,7 +2,7 @@ from datetime import timedelta
 import singer
 from singer import metrics, metadata, Transformer, utils
 from singer.utils import strptime_to_utc, strftime
-from tap_impact.transform import transform_json, convert
+from tap_impact.transform import transform_json
 from tap_impact.streams import STREAMS
 
 LOGGER = singer.get_logger()
@@ -237,13 +237,13 @@ def sync_endpoint(client,
             if isinstance(data, list) and not data_key in data:
                 data_list = data
                 data_dict[data_key] = data_list
-                transformed_data = transform_json(data_dict)[convert(data_key)]
+                transformed_data = transform_json(data_dict, stream_name, data_key)
             elif isinstance(data, dict) and not data_key in data:
                 data_list.append(data)
                 data_dict[data_key] = data_list
-                transformed_data = transform_json(data_dict)[convert(data_key)]
+                transformed_data = transform_json(data_dict, stream_name, data_key)
             else:
-                transformed_data = transform_json(data)[convert(data_key)]
+                transformed_data = transform_json(data, stream_name, data_key)
 
             # LOGGER.info('transformed_data = {}'.format(transformed_data)) # TESTING, comment out
             if not transformed_data or transformed_data is None:

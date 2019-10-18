@@ -99,7 +99,7 @@
     "note": {
       "type": ["null", "string"]
     },
-    "oid": {
+    "order_id": {
       "type": ["null", "string"]
     },
     "payout": {

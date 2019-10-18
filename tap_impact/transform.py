@@ -1,4 +1,7 @@
 import re
+import singer
+
+LOGGER = singer.get_logger()
 
 # Convert camelCase to snake_case
 def convert(name):
@@ -33,7 +36,23 @@ def convert_json(this_json):
     return out
 
 
+# Replace system/reserved field 'oid' with 'order_id'
+def replace_order_id(this_json, data_key):
+    i = 0
+    for record in this_json[data_key]:
+        order_id = record.get('oid')
+        this_json[data_key][i]['order_id'] = order_id
+        this_json[data_key][i].pop('oid', None)
+        i = i + 1
+    return this_json
+
+
 # Run all transforms: convert camelCase to snake_case for fieldname keys
-def transform_json(this_json):
-    transformed_json = convert_json(this_json)
+def transform_json(this_json, stream_name, data_key):
+    converted_json = convert_json(this_json)
+    converted_data_key = convert(data_key)
+    if stream_name in ('actions', 'action_updates'):
+        transformed_json = replace_order_id(converted_json, converted_data_key)[converted_data_key]
+    else:
+        transformed_json = converted_json[converted_data_key]
     return transformed_json

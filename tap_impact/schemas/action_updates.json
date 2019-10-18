@@ -61,7 +61,7 @@
     "media_partner_id": {
       "type": ["null", "integer"]
     },
-    "oid": {
+    "order_id": {
       "type": ["null", "string"]
     },
     "quantity": {
