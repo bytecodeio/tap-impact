@@ -10,7 +10,7 @@ setup(name='tap-impact',
       py_modules=['tap_impact'],
       install_requires=[
           'backoff==1.8.0',
-          'requests==2.22.0',
+          'requests==2.31.0',
           'singer-python==5.8.1'
       ],
       entry_points='''
